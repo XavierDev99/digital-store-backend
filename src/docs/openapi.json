@@ -1,0 +1,966 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Digital Store API",
+    "version": "0.3.0",
+    "description": "API de usuários, categorias e produtos da Digital Store."
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/v1/user": {
+      "post": {
+        "summary": "Cadastrar usuário",
+        "tags": [
+          "Usuários"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "firstname",
+                  "surname",
+                  "email",
+                  "password",
+                  "confirmPassword"
+                ],
+                "properties": {
+                  "firstname": {
+                    "type": "string",
+                    "example": "Jessé"
+                  },
+                  "surname": {
+                    "type": "string",
+                    "example": "Medeiros"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "jesse@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "SenhaTeste123!"
+                  },
+                  "confirmPassword": {
+                    "type": "string",
+                    "example": "SenhaTeste123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário cadastrado"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          }
+        }
+      }
+    },
+    "/v1/user/token": {
+      "post": {
+        "summary": "Entrar e gerar token",
+        "tags": [
+          "Usuários"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "jesse@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "SenhaTeste123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Consulta realizada"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          }
+        }
+      }
+    },
+    "/v1/user/{id}": {
+      "get": {
+        "summary": "Consultar usuário",
+        "tags": [
+          "Usuários"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta realizada"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar a própria conta",
+        "tags": [
+          "Usuários"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "firstname",
+                  "surname",
+                  "email"
+                ],
+                "properties": {
+                  "firstname": {
+                    "type": "string",
+                    "example": "Jessé"
+                  },
+                  "surname": {
+                    "type": "string",
+                    "example": "Medeiros"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "jesse@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Operação concluída sem conteúdo"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "403": {
+            "description": "Conta de outro usuário"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Excluir a própria conta",
+        "tags": [
+          "Usuários"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operação concluída sem conteúdo"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "403": {
+            "description": "Conta de outro usuário"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          }
+        }
+      }
+    },
+    "/v1/category/search": {
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "summary": "Buscar categorias",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 12
+            },
+            "description": "Use -1 para retornar todas."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "name,slug"
+          },
+          {
+            "name": "use_in_menu",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta realizada"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          }
+        }
+      }
+    },
+    "/v1/category": {
+      "post": {
+        "tags": [
+          "Categorias"
+        ],
+        "summary": "Cadastrar categoria",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Categoria cadastrada"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "slug"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Tênis"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "example": "tenis"
+                  },
+                  "use_in_menu": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/category/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "summary": "Consultar categoria",
+        "responses": {
+          "200": {
+            "description": "Consulta realizada"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Categorias"
+        ],
+        "summary": "Atualizar categoria",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operação concluída sem conteúdo"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "slug"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Tênis"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "example": "tenis"
+                  },
+                  "use_in_menu": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Categorias"
+        ],
+        "summary": "Excluir categoria",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operação concluída sem conteúdo"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        }
+      }
+    },
+    "/v1/product": {
+      "post": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Cadastrar produto",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Produto criado"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "slug",
+                  "price",
+                  "price_with_discount"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "slug": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "use_in_menu": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "stock": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "price": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "price_with_discount": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "category_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "deleted": {
+                          "type": "boolean"
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "image/png",
+                            "image/jpeg",
+                            "image/jpg"
+                          ]
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "Base64 de PNG/JPEG, URL HTTP/HTTPS ou caminho local já retornado para essa imagem."
+                        }
+                      }
+                    }
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "deleted": {
+                          "type": "boolean"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "shape": {
+                          "type": "string",
+                          "enum": [
+                            "square",
+                            "circle"
+                          ]
+                        },
+                        "radius": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]+px$"
+                            }
+                          ]
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "text",
+                            "color"
+                          ]
+                        },
+                        "values": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Alias de values"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "enabled": true,
+                "name": "Tênis de corrida",
+                "slug": "tenis-de-corrida",
+                "stock": 10,
+                "description": "Tênis para caminhada e corrida.",
+                "price": 200,
+                "price_with_discount": 150,
+                "category_ids": [
+                  1
+                ],
+                "images": [],
+                "options": [
+                  {
+                    "title": "Tamanho",
+                    "shape": "square",
+                    "radius": 4,
+                    "type": "text",
+                    "values": [
+                      "39",
+                      "40",
+                      "41"
+                    ]
+                  },
+                  {
+                    "title": "Cor",
+                    "shape": "circle",
+                    "type": "color",
+                    "values": [
+                      "#000000",
+                      "#FFFFFF"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/product/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Consultar produto",
+        "responses": {
+          "200": {
+            "description": "Consulta realizada"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Atualizar produto, imagens e opções",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operação concluída sem conteúdo"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "slug": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "use_in_menu": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "stock": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "price": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "price_with_discount": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "category_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "deleted": {
+                          "type": "boolean"
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "image/png",
+                            "image/jpeg",
+                            "image/jpg"
+                          ]
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "Base64 de PNG/JPEG, URL HTTP/HTTPS ou caminho local já retornado para essa imagem."
+                        }
+                      }
+                    }
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "deleted": {
+                          "type": "boolean"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "shape": {
+                          "type": "string",
+                          "enum": [
+                            "square",
+                            "circle"
+                          ]
+                        },
+                        "radius": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]+px$"
+                            }
+                          ]
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "text",
+                            "color"
+                          ]
+                        },
+                        "values": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Alias de values"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "stock": 20,
+                "price": 200,
+                "price_with_discount": 140
+              }
+            }
+          }
+        },
+        "description": "Campos ausentes são preservados. category_ids substitui as categorias. Em images/options, use id para alterar e id + deleted:true para excluir. Sem id, um novo item é criado."
+      },
+      "delete": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Excluir produto",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operação concluída sem conteúdo"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        }
+      }
+    },
+    "/v1/product/search": {
+      "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Buscar produtos",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 12
+            },
+            "description": "-1 retorna todos."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Campos separados por vírgulas. Vazio omite o filtro."
+          },
+          {
+            "name": "match",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca em nome e descrição."
+          },
+          {
+            "name": "category_ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "IDs separados por vírgulas."
+          },
+          {
+            "name": "price-range",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Intervalo de preço, por exemplo 100-200."
+          },
+          {
+            "name": "option[1]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Substitua 1 pelo ID da opção. Valores separados por vírgulas, por exemplo 39,40."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta realizada"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          }
+        }
+      }
+    }
+  }
+}
